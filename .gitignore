@@ -3,7 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-projects_data/*
+projects/*
+knowledge_base/*
 # C extensions
 *.so
 
