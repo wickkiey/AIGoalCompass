@@ -8,10 +8,18 @@ from datetime import datetime
 import json
 from typing import Dict, List, Any
 import markdown
+import speech_recognition as sr
 
 # CrewAI and Ollama imports
 from crewai import Agent, Task, Crew, Process
 from langchain_ollama import OllamaLLM
+
+# Import mic recorder
+try:
+    from streamlit_mic_recorder import mic_recorder
+    MIC_RECORDER_AVAILABLE = True
+except ImportError:
+    MIC_RECORDER_AVAILABLE = False
 
 # Set page config
 st.set_page_config(
@@ -20,6 +28,84 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+def transcribe_audio(audio_bytes):
+    """Convert audio bytes to text using speech recognition"""
+    if audio_bytes is None:
+        return ""
+    
+    recognizer = sr.Recognizer()
+    
+    try:
+        # Save audio bytes to a temporary file
+        import io
+        import wave
+        import tempfile
+        
+        # Create a temporary WAV file
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as tmp_file:
+            tmp_file.write(audio_bytes)
+            tmp_file_path = tmp_file.name
+        
+        # Read the audio file
+        with sr.AudioFile(tmp_file_path) as source:
+            audio_data = recognizer.record(source)
+            text = recognizer.recognize_google(audio_data)
+            
+        # Clean up temporary file
+        os.unlink(tmp_file_path)
+        
+        return text
+    except sr.UnknownValueError:
+        st.warning("Could not understand the audio. Please try again.")
+        return ""
+    except sr.RequestError as e:
+        st.error(f"Could not request results from speech recognition service: {e}")
+        return ""
+    except Exception as e:
+        st.error(f"Error during transcription: {e}")
+        return ""
+
+def voice_input_field(label: str, help_text: str, height: int = 150, key_prefix: str = ""):
+    """Create a text area with voice input capability"""
+    st.markdown(f"**{label}**")
+    
+    col_text, col_voice = st.columns([4, 1])
+    
+    with col_text:
+        text_value = st.text_area(
+            label,
+            height=height,
+            help=help_text,
+            key=f"{key_prefix}_text",
+            label_visibility="collapsed"
+        )
+    
+    with col_voice:
+        st.markdown("<br>", unsafe_allow_html=True)  # Add spacing
+        if MIC_RECORDER_AVAILABLE:
+            audio = mic_recorder(
+                start_prompt="🎤 Record",
+                stop_prompt="⏹️ Stop",
+                just_once=False,
+                use_container_width=True,
+                key=f"{key_prefix}_mic"
+            )
+            
+            if audio:
+                st.success("✅ Recorded")
+                transcribed_text = transcribe_audio(audio['bytes'])
+                if transcribed_text:
+                    # Append transcribed text to existing text
+                    if text_value:
+                        st.session_state[f"{key_prefix}_text"] = text_value + "\n" + transcribed_text
+                    else:
+                        st.session_state[f"{key_prefix}_text"] = transcribed_text
+                    st.rerun()
+        else:
+            st.info("🎤\n\nVoice input unavailable")
+    
+    return text_value
 
 class ProjectManager:
     def __init__(self, projects_dir: str = "projects"):
@@ -265,7 +351,7 @@ def render_project_analyzer(projects: Dict[str, Dict[str, Any]], analyzer: Proje
         # Display project details
         st.subheader(f"📁 {selected_project.replace('_', ' / ')}")
         
-        tab1, tab2, tab3 = st.tabs(["📖 Project Details", "🤖 AI Analysis", "📊 Visual Flow"])
+        tab1, tab2, tab3, tab4 = st.tabs(["📖 Project Details", "🤖 AI Analysis", "📊 Visual Flow", "✏️ Edit Project"])
         
         with tab1:
             col1, col2 = st.columns(2)
@@ -326,10 +412,111 @@ def render_project_analyzer(projects: Dict[str, Dict[str, Any]], analyzer: Proje
                 # Fallback: Simple text-based flow
                 st.markdown("**Project Flow (Text-based):**")
                 st.markdown(f"🎯 **Goal** → ✅ **Completed Tasks** → ⏳ **Next Steps** → 🏆 **Success**")
+        
+        with tab4:
+            st.subheader("✏️ Edit Project")
+            
+            if MIC_RECORDER_AVAILABLE:
+                st.info("🎤 Voice input is enabled! Use the voice input helper below to update your project with voice.")
+            
+            with st.form("edit_project_form"):
+                edit_goal = st.text_area(
+                    "🎯 Project Goal",
+                    value=project_data['goal'],
+                    height=150,
+                    key="edit_goal"
+                )
+                
+                col_edit1, col_edit2 = st.columns(2)
+                
+                with col_edit1:
+                    edit_completed = st.text_area(
+                        "✅ Completed Tasks",
+                        value=project_data['completed'],
+                        height=150,
+                        key="edit_completed"
+                    )
+                
+                with col_edit2:
+                    edit_next = st.text_area(
+                        "📝 Next Steps",
+                        value=project_data['next'],
+                        height=150,
+                        key="edit_next"
+                    )
+                
+                if st.form_submit_button("💾 Save Changes", type="primary"):
+                    project_manager = ProjectManager()
+                    if project_manager.update_project(
+                        project_data['path'],
+                        edit_goal,
+                        edit_completed,
+                        edit_next
+                    ):
+                        st.success("✅ Project updated successfully!")
+                        st.rerun()
+            
+            # Voice input helper for editing
+            if MIC_RECORDER_AVAILABLE:
+                st.markdown("---")
+                st.markdown("### 🎤 Voice Input Helper for Editing")
+                
+                voice_edit_col1, voice_edit_col2, voice_edit_col3 = st.columns(3)
+                
+                with voice_edit_col1:
+                    st.markdown("**🎯 Add to Goal**")
+                    edit_goal_audio = mic_recorder(
+                        start_prompt="🎤 Record",
+                        stop_prompt="⏹️ Stop",
+                        just_once=False,
+                        use_container_width=True,
+                        key="edit_goal_voice"
+                    )
+                    
+                    if edit_goal_audio:
+                        transcribed = transcribe_audio(edit_goal_audio['bytes'])
+                        if transcribed:
+                            st.text_area("Transcribed:", value=transcribed, height=80, key="edit_goal_transcribed")
+                
+                with voice_edit_col2:
+                    st.markdown("**✅ Add to Completed**")
+                    edit_completed_audio = mic_recorder(
+                        start_prompt="🎤 Record",
+                        stop_prompt="⏹️ Stop",
+                        just_once=False,
+                        use_container_width=True,
+                        key="edit_completed_voice"
+                    )
+                    
+                    if edit_completed_audio:
+                        transcribed = transcribe_audio(edit_completed_audio['bytes'])
+                        if transcribed:
+                            st.text_area("Transcribed:", value=transcribed, height=80, key="edit_completed_transcribed")
+                
+                with voice_edit_col3:
+                    st.markdown("**📝 Add to Next Steps**")
+                    edit_next_audio = mic_recorder(
+                        start_prompt="🎤 Record",
+                        stop_prompt="⏹️ Stop",
+                        just_once=False,
+                        use_container_width=True,
+                        key="edit_next_voice"
+                    )
+                    
+                    if edit_next_audio:
+                        transcribed = transcribe_audio(edit_next_audio['bytes'])
+                        if transcribed:
+                            st.text_area("Transcribed:", value=transcribed, height=80, key="edit_next_transcribed")
 
 def render_project_creator():
     """Render new project creation interface"""
     st.header("➕ Create New Project")
+    
+    # Show voice input availability
+    if MIC_RECORDER_AVAILABLE:
+        st.info("🎤 Voice input is enabled! Click the microphone button next to any field to use voice-to-text.")
+    else:
+        st.warning("🎤 Voice input is not available. Install streamlit-mic-recorder for voice input functionality.")
     
     with st.form("new_project_form"):
         col1, col2 = st.columns(2)
@@ -343,26 +530,41 @@ def render_project_creator():
             if parent_dir and project_name:
                 st.code(f"projects/{parent_dir}/{project_name}/\n├── goal.md\n├── completed.md\n└── next.md")
         
+        st.markdown("---")
+        
+        # Use the voice input fields
+        st.markdown("### 🎯 Project Goal")
+        st.markdown("*Describe the main objective and requirements of your project*")
         goal = st.text_area(
-            "🎯 Project Goal",
+            "Project Goal",
             height=200,
-            help="Describe the main objective and requirements of your project"
+            help="Describe the main objective and requirements of your project",
+            key="goal_text",
+            label_visibility="collapsed"
         )
         
         col3, col4 = st.columns(2)
         
         with col3:
+            st.markdown("### ✅ Completed Tasks")
+            st.markdown("*List what has already been accomplished*")
             completed = st.text_area(
-                "✅ Completed Tasks",
+                "Completed Tasks",
                 height=150,
-                help="List what has already been accomplished"
+                help="List what has already been accomplished",
+                key="completed_text",
+                label_visibility="collapsed"
             )
         
         with col4:
+            st.markdown("### 📝 Next Steps")
+            st.markdown("*Define the immediate next actions to take*")
             next_steps = st.text_area(
-                "📝 Next Steps",
+                "Next Steps",
                 height=150,
-                help="Define the immediate next actions to take"
+                help="Define the immediate next actions to take",
+                key="next_steps_text",
+                label_visibility="collapsed"
             )
         
         submitted = st.form_submit_button("🚀 Create Project", type="primary")
@@ -384,6 +586,59 @@ def render_project_creator():
                     st.success(f"✅ Project '{parent_dir}/{project_name}' created successfully!")
                     st.balloons()
                     st.rerun()
+    
+    # Voice input section outside the form for better UX
+    if MIC_RECORDER_AVAILABLE:
+        st.markdown("---")
+        st.markdown("### 🎤 Voice Input Helper")
+        st.markdown("Use the sections below to record voice input, then copy the transcribed text to the form above.")
+        
+        voice_col1, voice_col2, voice_col3 = st.columns(3)
+        
+        with voice_col1:
+            st.markdown("**🎯 Goal Voice Input**")
+            goal_audio = mic_recorder(
+                start_prompt="🎤 Record Goal",
+                stop_prompt="⏹️ Stop",
+                just_once=False,
+                use_container_width=True,
+                key="goal_voice"
+            )
+            
+            if goal_audio:
+                transcribed = transcribe_audio(goal_audio['bytes'])
+                if transcribed:
+                    st.text_area("Transcribed Goal:", value=transcribed, height=100, key="goal_transcribed")
+        
+        with voice_col2:
+            st.markdown("**✅ Completed Tasks Voice Input**")
+            completed_audio = mic_recorder(
+                start_prompt="🎤 Record Completed",
+                stop_prompt="⏹️ Stop",
+                just_once=False,
+                use_container_width=True,
+                key="completed_voice"
+            )
+            
+            if completed_audio:
+                transcribed = transcribe_audio(completed_audio['bytes'])
+                if transcribed:
+                    st.text_area("Transcribed Completed:", value=transcribed, height=100, key="completed_transcribed")
+        
+        with voice_col3:
+            st.markdown("**📝 Next Steps Voice Input**")
+            next_audio = mic_recorder(
+                start_prompt="🎤 Record Next Steps",
+                stop_prompt="⏹️ Stop",
+                just_once=False,
+                use_container_width=True,
+                key="next_voice"
+            )
+            
+            if next_audio:
+                transcribed = transcribe_audio(next_audio['bytes'])
+                if transcribed:
+                    st.text_area("Transcribed Next Steps:", value=transcribed, height=100, key="next_transcribed")
 
 def main():
     st.title("🎯 AI Goal Compass")
@@ -433,6 +688,12 @@ def main():
     st.sidebar.markdown("• Ensure Ollama is running")
     st.sidebar.markdown("• Use clear, detailed project goals")
     st.sidebar.markdown("• Update completed tasks regularly")
+    
+    if MIC_RECORDER_AVAILABLE:
+        st.sidebar.markdown("• 🎤 Voice input is available!")
+        st.sidebar.markdown("• Click microphone buttons to record")
+    else:
+        st.sidebar.markdown("• ℹ️ Install streamlit-mic-recorder for voice input")
 
 if __name__ == "__main__":
     main()

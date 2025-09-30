@@ -2,6 +2,18 @@
 
 An intelligent project analysis and management system built with Streamlit, CrewAI, and Ollama.
 
+## 📚 Documentation
+
+- **[QUICK_START.md](QUICK_START.md)** - ⚡ 60-second quick start guide (START HERE!)
+- **[README.md](README.md)** - Main documentation (you are here)
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - 🎉 Complete implementation summary
+- **[VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md)** - Complete guide for voice-to-text features
+- **[USAGE_EXAMPLES.md](USAGE_EXAMPLES.md)** - Practical examples and use cases
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Testing checklist and procedures
+- **[CHANGES_SUMMARY.md](CHANGES_SUMMARY.md)** - Summary of all changes made
+- **[APP_FLOW_DIAGRAM.md](APP_FLOW_DIAGRAM.md)** - Visual flow diagrams and architecture
+- **[UI_SCREENSHOTS_DESCRIPTION.md](UI_SCREENSHOTS_DESCRIPTION.md)** - UI mockups and descriptions
+
 ## ✨ Features
 
 - **📊 Project Overview Dashboard**: Get insights into all your projects at a glance
@@ -9,6 +21,7 @@ An intelligent project analysis and management system built with Streamlit, Crew
 - **📊 Visual Flow Diagrams**: Mermaid-based visualization of project progress and workflow
 - **➕ Project Creation**: Easy creation of new projects with structured markdown files
 - **📁 Project Management**: Automatic scanning and organization of project folders
+- **🎤 Voice-to-Text Input**: Record voice input and automatically transcribe it to text for project fields
 
 ## 🚀 Getting Started
 
@@ -87,6 +100,7 @@ projects/
 - Select any project for AI-powered analysis
 - Get strategic recommendations from CrewAI agents
 - View detailed project information and timelines
+- Edit projects with voice input support
 
 ### 3. 📊 Visual Flow Diagrams
 - Automatic generation of Mermaid flow charts
@@ -97,6 +111,14 @@ projects/
 - Easy project creation with guided forms
 - Automatic folder structure generation
 - Template-based project setup
+- 🎤 Voice input support for all text fields
+
+### 5. 🎤 Voice-to-Text Input
+- Click the microphone button to record voice input
+- Automatically transcribes speech to text
+- Available for project creation and editing
+- Supports multiple languages via Google Speech Recognition
+- **See [VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md) for detailed instructions**
 
 ## 🤖 AI Analysis Features
 
@@ -131,6 +153,7 @@ The application uses **CrewAI** with two specialized agents:
 - **Visualization**: Mermaid, Plotly
 - **Data Processing**: Pandas
 - **File Management**: Pathlib
+- **Voice Recognition**: SpeechRecognition, streamlit-mic-recorder
 
 ## 📝 Usage Tips
 
@@ -139,6 +162,8 @@ The application uses **CrewAI** with two specialized agents:
 3. **Define next steps**: Use `next.md` for immediate actionable items
 4. **Use AI analysis**: Leverage the AI agents for strategic guidance
 5. **Visual planning**: Use flow diagrams to understand project structure
+6. **Voice input**: Use the microphone button to quickly add content via voice
+7. **Clear speech**: Speak clearly and at a moderate pace for best transcription results
 
 ## 🔧 Troubleshooting
 
@@ -161,6 +186,12 @@ pip install -r requirements.txt --force-reinstall
 - Ensure `goal.md` exists in the project folder
 - Check file permissions
 - Use the "Refresh Projects" button in Settings
+
+### Voice Input Not Working
+- Verify microphone permissions in your browser
+- Install required packages: `pip install streamlit-mic-recorder SpeechRecognition`
+- Check internet connection (required for Google Speech Recognition)
+- See [VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md) for detailed troubleshooting
 
 ## 🤝 Contributing
 
