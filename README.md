@@ -9,6 +9,7 @@ An intelligent project analysis and management system built with Streamlit, Crew
 - **📊 Visual Flow Diagrams**: Mermaid-based visualization of project progress and workflow
 - **➕ Project Creation**: Easy creation of new projects with structured markdown files
 - **📁 Project Management**: Automatic scanning and organization of project folders
+- **🎤 Voice-to-Text Input**: Record voice input and automatically transcribe it to text for project fields
 
 ## 🚀 Getting Started
 
@@ -97,6 +98,13 @@ projects/
 - Easy project creation with guided forms
 - Automatic folder structure generation
 - Template-based project setup
+- 🎤 Voice input support for all text fields
+
+### 5. 🎤 Voice-to-Text Input
+- Click the microphone button to record voice input
+- Automatically transcribes speech to text
+- Available for project creation and editing
+- Supports multiple languages via Google Speech Recognition
 
 ## 🤖 AI Analysis Features
 
@@ -131,6 +139,7 @@ The application uses **CrewAI** with two specialized agents:
 - **Visualization**: Mermaid, Plotly
 - **Data Processing**: Pandas
 - **File Management**: Pathlib
+- **Voice Recognition**: SpeechRecognition, streamlit-mic-recorder
 
 ## 📝 Usage Tips
 
@@ -139,6 +148,8 @@ The application uses **CrewAI** with two specialized agents:
 3. **Define next steps**: Use `next.md` for immediate actionable items
 4. **Use AI analysis**: Leverage the AI agents for strategic guidance
 5. **Visual planning**: Use flow diagrams to understand project structure
+6. **Voice input**: Use the microphone button to quickly add content via voice
+7. **Clear speech**: Speak clearly and at a moderate pace for best transcription results
 
 ## 🔧 Troubleshooting
 
