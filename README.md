@@ -88,6 +88,7 @@ projects/
 - Select any project for AI-powered analysis
 - Get strategic recommendations from CrewAI agents
 - View detailed project information and timelines
+- Edit projects with voice input support
 
 ### 3. 📊 Visual Flow Diagrams
 - Automatic generation of Mermaid flow charts
@@ -105,6 +106,7 @@ projects/
 - Automatically transcribes speech to text
 - Available for project creation and editing
 - Supports multiple languages via Google Speech Recognition
+- **See [VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md) for detailed instructions**
 
 ## 🤖 AI Analysis Features
 
@@ -172,6 +174,12 @@ pip install -r requirements.txt --force-reinstall
 - Ensure `goal.md` exists in the project folder
 - Check file permissions
 - Use the "Refresh Projects" button in Settings
+
+### Voice Input Not Working
+- Verify microphone permissions in your browser
+- Install required packages: `pip install streamlit-mic-recorder SpeechRecognition`
+- Check internet connection (required for Google Speech Recognition)
+- See [VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md) for detailed troubleshooting
 
 ## 🤝 Contributing
 
