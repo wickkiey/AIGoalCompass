@@ -4,6 +4,7 @@ An intelligent project analysis and management system built with Streamlit, Crew
 
 ## 📚 Documentation
 
+- **[QUICK_START.md](QUICK_START.md)** - ⚡ 60-second quick start guide (START HERE!)
 - **[README.md](README.md)** - Main documentation (you are here)
 - **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - 🎉 Complete implementation summary
 - **[VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md)** - Complete guide for voice-to-text features
@@ -11,6 +12,7 @@ An intelligent project analysis and management system built with Streamlit, Crew
 - **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Testing checklist and procedures
 - **[CHANGES_SUMMARY.md](CHANGES_SUMMARY.md)** - Summary of all changes made
 - **[APP_FLOW_DIAGRAM.md](APP_FLOW_DIAGRAM.md)** - Visual flow diagrams and architecture
+- **[UI_SCREENSHOTS_DESCRIPTION.md](UI_SCREENSHOTS_DESCRIPTION.md)** - UI mockups and descriptions
 
 ## ✨ Features
 
