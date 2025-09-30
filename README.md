@@ -2,6 +2,15 @@
 
 An intelligent project analysis and management system built with Streamlit, CrewAI, and Ollama.
 
+## 📚 Documentation
+
+- **[README.md](README.md)** - Main documentation (you are here)
+- **[VOICE_INPUT_GUIDE.md](VOICE_INPUT_GUIDE.md)** - Complete guide for voice-to-text features
+- **[USAGE_EXAMPLES.md](USAGE_EXAMPLES.md)** - Practical examples and use cases
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Testing checklist and procedures
+- **[CHANGES_SUMMARY.md](CHANGES_SUMMARY.md)** - Summary of all changes made
+- **[APP_FLOW_DIAGRAM.md](APP_FLOW_DIAGRAM.md)** - Visual flow diagrams and architecture
+
 ## ✨ Features
 
 - **📊 Project Overview Dashboard**: Get insights into all your projects at a glance
